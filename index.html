@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Дело Лисицына — v3.3</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #151b23;
+      --text: #e6edf3;
+      --muted: #9da7b3;
+      --accent: #d4a72c;
+      --line: #30363d;
+      --bad: #ef6b73;
+      --good: #7ee787;
+      --mid: #d4a72c;
+      --blue: #79c0ff
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #192337, #0d1117 55%);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      line-height: 1.5
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: #0d1117dd;
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 24px
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 25px
+    }
+
+    .sub,
+    .muted {
+      color: var(--muted)
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      min-height: calc(100vh - 78px)
+    }
+
+    nav {
+      border-right: 1px solid var(--line);
+      padding: 16px;
+      position: sticky;
+      top: 78px;
+      height: calc(100vh - 78px);
+      overflow: auto
+    }
+
+    nav button {
+      display: block;
+      width: 100%;
+      margin: 0 0 8px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line);
+      text-align: left;
+      cursor: pointer
+    }
+
+    nav button:hover,
+    nav button.active {
+      border-color: var(--accent);
+      background: #221b0d
+    }
+
+    main {
+      padding: 24px;
+      max-width: 1260px
+    }
+
+    .section {
+      display: none
+    }
+
+    .section.active {
+      display: block
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel), #101720);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 15px;
+      box-shadow: 0 12px 30px #0005
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 16px
+    }
+
+    .case-img {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0b1016
+    }
+
+    .portrait {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--line)
+    }
+
+    .thumb {
+      width: 100%;
+      height: 165px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--line)
+    }
+
+    .evidence {
+      cursor: pointer;
+      transition: .15s;
+      min-height: 245px
+    }
+
+    .evidence:hover {
+      transform: translateY(-2px);
+      border-color: var(--blue)
+    }
+
+    .badge {
+      color: var(--accent);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em
+    }
+
+    textarea {
+      width: 100%;
+      background: #0d1117;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      margin: 6px 0 12px;
+      min-height: 160px
+    }
+
+    .btn {
+      background: #2a2110;
+      border: 1px solid var(--accent);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer
+    }
+
+    .result {
+      display: none;
+      margin-top: 14px;
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--line)
+    }
+
+    .good {
+      border-color: var(--good);
+      background: #102016
+    }
+
+    .mid {
+      border-color: var(--mid);
+      background: #201b0e
+    }
+
+    .bad {
+      border-color: var(--bad);
+      background: #241114
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: #000a;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 18px
+    }
+
+    .modal-inner {
+      background: #101720;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      max-width: 940px;
+      max-height: 90vh;
+      overflow: auto;
+      padding: 20px
+    }
+
+    .close {
+      float: right;
+      font-size: 26px;
+      background: transparent;
+      color: var(--muted);
+      border: 0;
+      cursor: pointer
+    }
+
+    .noimg {
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      padding: 25px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d1117
+    }
+
+    .modal-body p {
+      margin: 10px 0
+    }
+
+    .answers label {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #101720;
+      cursor: pointer
+    }
+
+    .answers input {
+      margin-right: 8px
+    }
+
+    @media(max-width:850px) {
+      .layout {
+        grid-template-columns: 1fr
+      }
+
+      nav {
+        position: relative;
+        top: 0;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
+      }
+
+      .hero {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 12px 0 16px;
+      flex-wrap: wrap
+    }
+
+    .pager {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: #101720;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 10px
+    }
+
+    .mark-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px
+    }
+
+    .mark-btn {
+      border: 1px solid var(--line);
+      background: #0d1117;
+      color: var(--text);
+      border-radius: 9px;
+      padding: 7px 9px;
+      cursor: pointer
+    }
+
+    .mark-btn.active {
+      border-color: var(--accent);
+      background: #1f1a0d
+    }
+
+    .card.evidence[draggable="true"] {
+      cursor: grab
+    }
+
+    .card.evidence.dragging {
+      opacity: .45;
+      transform: scale(.98)
+    }
+
+    .modal-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 16px
+    }
+
+    .modal-nav .btn {
+      min-width: 120px
+    }
+
+    .counter {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .grab-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Дело №22-05: исчезновение Артёма Лисицына — v3.3</h1>
+    <div class="sub">Папка материалов дела</div>
+  </header>
+  <div class="layout">
+    <nav id="nav"></nav>
+    <main>
+      <section id="brief" class="section active">
+        <div class="hero">
+          <div class="card">
+            <h2>Сводка</h2>
+            <p><b>Артём Лисицын</b>, реставратор городского музея, пропал вечером 22 мая 2026 года.</p>
+            <p>Утром 23 мая его телефон нашли у автостанции. В деле есть протоколы осмотра, камеры, переписки, документы
+              по старому зданию и объяснения людей, связанных с Артёмом.</p>
+          </div>
+          <div class="card"><img class="case-img" src="images/обложка.webp" alt="Обложка дела"></div>
+        </div>
+      </section>
+      <section id="suspects" class="section">
+        <h2>Фигуранты</h2>
+        <div class="toolbar"><span class="pill" id="suspectCounter"></span></div>
+        <div id="suspectGrid" class="grid"></div>
+      </section>
+      <section id="evidence" class="section">
+        <h2>Материалы дела</h2>
+        <p class="muted">Материалы расположены без тематической группировки. Карточки можно перетаскивать и отмечать как
+          важные или неважные.</p>
+        <div class="toolbar"><span id="evidenceCounter" class="counter"></span><button class="btn"
+            onclick="resetEvidenceOrder()">Сбросить порядок</button></div>
+        <div id="evidenceGrid" class="grid"></div>
+      </section>
+      <section id="map" class="section">
+        <h2>Карта и адреса</h2>
+        <div class="hero">
+          <div class="card"><img class="case-img" src="images/карта.webp" alt="Карта"></div>
+          <div class="card">
+            <h3>Адреса из материалов</h3>
+            <ul>
+              <li>Музей истории города — ул. Центральная, 14</li>
+              <li>Кафе «Сова» — ул. Центральная, 12</li>
+              <li>Автостанция — пл. Вокзальная, 1</li>
+              <li>Банкомат — пр. Победы, 18</li>
+              <li>Гостиница «Северная» — ул. Прибрежная, 4</li>
+              <li>Дом Павла — Соляной пер., 3</li>
+              <li>Дача родителей Лисицыных — пос. Сосновка, ул. Лесная, 6</li>
+              <li>Старый пирс</li>
+              <li>Морская улица</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <section id="notes" class="section">
+        <h2>Заметки следователя</h2><textarea id="notesArea"
+          placeholder="Связи, версии, противоречия, проверка алиби..."></textarea><button class="btn"
+          onclick="saveNotes()">Сохранить</button> <span id="saved" class="muted"></span>
+      </section>
+      <section id="final" class="section"><h2>Проверка версии</h2><p class="muted">Ответьте на вопросы по материалам дела и нажмите «Проверить» — вы увидите, насколько ваша версия сходится с материалами, и что произошло на самом деле.</p><div id="quiz" class="grid"></div><div class="toolbar" style="justify-content:flex-start"><button class="btn" onclick="checkVersion()">Проверить</button> <span id="quizScore" class="muted"></span></div><div id="quizResult" class="result"></div><div id="trueStory" class="result good" style="display:none"></div></section>
+    </main>
+  </div>
+  <div id="modal" class="modal" onclick="backdropClose(event)">
+    <div class="modal-inner"><button class="close" onclick="closeModal()">×</button>
+      <h2 id="mt"></h2>
+      <div id="mimg"></div>
+      <div id="mbody" class="modal-body"></div>
+    </div>
+  </div>
+  <script>
+    const sections = [["brief", "Сводка"], ["suspects", "Фигуранты"], ["evidence", "Материалы дела"], ["map", "Карта"], ["notes", "Заметки"], ["final", "Проверка версии"]];
+    const evidence = [{"title":"Ориентировка о пропаже","source":"Дежурная часть ОМВД по г. Тихая Пристань. 23.05.2026, 09:15.","content":"Разыскивается Лисицын Артём Андреевич, 36 лет. Последний подтверждённый контакт — вечер 22.05.2026. Приметы: рост 182 см, тёмные волосы. При себе мог иметь рюкзак тёмного цвета. Просьба сообщить любую информацию о перемещениях после 19:00 22 мая.","imgsrc":"images/ориентировка.webp"},{"title":"Фото рабочего кабинета","source":"Рабочий кабинет Артёма Лисицына, музей истории города, ул. Центральная, 14. Фото сделано 23.05.2026.","content":"На фотографии виден беспорядок у рабочего стола: документы и папки лежат на полу, дверцы шкафа открыты, часть папок вынута, ящики стола раскрыты.","imgsrc":"images/кабинет.webp"},{"title":"Договор задатка за дачу","source":"Копия предварительного соглашения, предоставленная Светланой Лисицыной.","content":"Предварительное соглашение от 17.05.2026. Объект: садовый участок, пос. Сосновка, ул. Лесная, 6. Продавец: Лисицына Светлана Андреевна. Покупатель: Фролов Денис Игоревич. Сумма задатка: 50 000 ₽. Оформление сделки назначено на июнь 2026 года.","imgsrc":"images/соглашение о продаже.webp"},{"title":"CCTV кафе Сова","source":"Камера у входа кафе «Сова». Фрагмент 22.05.2026.","content":"На фрагменте 22.05.2026 около 19:42 видно Артёма Лисицына у выхода из кафе. Отдельно в зоне входа, через стекло и блик камеры, различима фигура в тёмном пальто и красном шарфе; лицо не читается.","imgsrc":"images/камера кафе.webp"},{"title":"Архивная опись","source":"Городской архив г. Тихая Пристань, опись фонда гостиницы «Северная» от 12.04.2019.","content":"В городской архив переданы кадровые документы за 1986–2018 гг., бухгалтерская документация за 1994–2018 гг., журнал регистрации гостей за 1992–2018 гг., договоры поставки за 2001–2017 гг. В описи указаны как отсутствующие журналы аварийных работ, журналы технических обходов и акты обследования подвальных помещений.","imgsrc":"images/опись архива.webp"},{"title":"Телефон Артёма","source":"Протокол осмотра предмета. Найден 23.05.2026 у здания автостанции, пл. Вокзальная, 1.","content":"Мобильный телефон Лисицына Артёма Андреевича найден утром 23.05.2026 у здания автостанции на пл. Вокзальной, 1. SIM-карта отсутствует; лоток SIM не повреждён. Последняя регистрация устройства в сети — 22.05.2026 около 20:18, район автостанции. Внешних повреждений корпуса и экрана не обнаружено.","imgsrc":"images/телефон 2.webp"},{"title":"Письмо Миронова 16:28","source":"Почтовый ящик Артёма. 22.05.2026, 16:28.","content":"В письме от 22.05.2026, 16:28, Миронов О.В. просит Артёма подтвердить промежуточные сроки по материалам для проекта реконструкции «Северной».","imgsrc":"images/письмо Миронова 1.webp"},{"title":"Чек кафе Сова","source":"Кафе «Сова», ул. Центральная, 12. Кассовый чек №1148.","content":"Кассовый чек от 22.05.2026, 18:33. Оплата банковской картой. В чеке указаны два напитка и десерт, итоговая сумма — 640 ₽.","imgsrc":"images/чек кафе.webp"},{"title":"Объяснение Павла Сомова","source":"Протокол опроса Сомова П.Н., бывшего смотрителя гостиницы, 23.05.2026.","content":"Сомов П.Н. говорит, что предупреждал Артёма об аварийном состоянии здания. Он вспоминает бывшую прачечную и старые служебные помещения, но не подтверждает встречу с Артёмом ночью.","imgsrc":"images/опрос Сомов.webp"},{"title":"Билет до Южного порта","source":"Электронная квитанция перевозчика в почте Артёма.","content":"Маршрут: Тихая Пристань — Южный порт. Дата отправления: 22.05.2026. Время: 21:10. Место: 12. Пассажир: Лисицын Артём Андреевич. Оплата произведена 22.05.2026 в 20:05.","imgsrc":"images/билет.webp"},{"title":"Старая фотография","source":"Семейная папка Лисицыных.","content":"Подпись на фото: «Северная. Август 1998». На групповой фотографии сотрудников гостиницы есть рукописные отметки. На заднем плане виден служебный вход, похожий на дверь со стороны бывшей прачечной.","imgsrc":"images/старое фото.webp"},{"title":"СМС банка Светланы","source":"Телефон Светланы Лисицыной, осмотрен с её согласия.","content":"SMS-уведомление банка от 22.05.2026 фиксирует просроченную задолженность Светланы Лисицыной по кредитному договору — 118 400 ₽ с оплатой до 26.05.2026.","imgsrc":"images/уведомление банка.webp"},{"title":"Выписка перевозчика","source":"Ответ автостанции по рейсу Тихая Пристань — Южный порт от 22.05.2026.","content":"Рейс Тихая Пристань — Южный порт отправлен 22.05.2026 в 21:10. Электронный билет на имя Лисицына А.А. оплачен 22.05.2026 в 20:05. Посадка по этому билету не подтверждена; QR-код билета Лисицына не проверялся.","imgsrc":"images/выписка билет.webp"},{"title":"Объяснение Лены Рябовой","source":"Протокол опроса Рябовой Е.А., сотрудницы кафе «Сова», 23.05.2026.","content":"Рябова Е.А. сообщает, что вечером 22.05.2026 видела Артёма в кафе. Также она заметила отдельную плохо различимую фигуру в красном шарфе у входа; ей показалось, что Артём кого-то ждал. Совместный столик, разговор или передачу предметов она не описывает.","imgsrc":"images/опрос Рябова.webp"},{"title":"План здания","source":"Материалы проекта реконструкции «Берег-Строй», 2025 год.","content":"План проекта реконструкции показывает первый и второй этажи гостиницы «Северная» в материалах «Берег-Строй» за 2025 год.","imgsrc":"images/план реконструкции.webp"},{"title":"История заказов такси","source":"Скрин истории поездок водителя Романа Кудрина за 22.05.2026.","content":"В истории поездок Романа Кудрина за 22.05.2026 видны выполненные заказы до 20:05 и после 20:52. В промежутке 20:05–20:52 активных заказов в приложении нет; поездка Артёма Лисицына в приложении не отражена.","imgsrc":"images/приложение такси.webp"},{"title":"Протокол осмотра квартиры","source":"Квартира Артёма Лисицына. Осмотр 23.05.2026, 12:10–13:05.","content":"В квартире обнаружены паспорт гражданина РФ на имя Лисицына Артёма Андреевича, банковские карты, повседневная одежда, зарядные устройства, запасные ключи. Крупные личные вещи на месте. По словам Светланы Лисицыной, в квартире отсутствуют ноутбук Артёма и синяя рабочая папка, которую он называл «по Северной». Следов взлома входной двери не обнаружено.","imgsrc":"images/осмотр квартиры.webp"},{"title":"План здания 1997","source":"Копия плана из фондов музея, 1997 год.","content":"План 1997 года показывает первый этаж, второй этаж и подвал гостиницы «Северная». На подвальном уровне обозначены лестница, прачечная, технический коридор, служебный архив и служебный выход.","imgsrc":"images/старый план.webp"},{"title":"Объяснение соседки","source":"Протокол опроса Крыловой Н.В., соседки по даче, 23.05.2026.","content":"Крылова Н.В. сообщает о споре Светланы и Артёма из-за дачи и семейных вещей. Сведений о событиях после исчезновения Артёма она не сообщает.","imgsrc":"images/опрос Крылова.webp"},{"title":"Внутреннее письмо Берег-Строй","source":"Фрагмент корпоративного письма «Берег-Строй», пересланный Артёму с неизвестного адреса.","content":"Во внутренней переписке обсуждаются возможная задержка графика, пересмотр сметы и необходимость дополнительного обследования подвального уровня гостиницы «Северная».","imgsrc":"images/корпоратичное письмо.webp"},{"title":"Детализация звонков","source":"Ответ оператора связи по номеру Артёма Лисицына.","content":"22.05.2026: 18:18 — исходящий вызов Марине Громовой, длительность 01:42; 19:03 — входящий вызов, номер скрыт, длительность 00:18; 20:03 — исходящий вызов Роману Кудрину, длительность 00:51. Последняя активность устройства зафиксирована около 20:18 в районе автостанции.","imgsrc":"images/звонки.webp"},{"title":"Полицейская сводка","source":"Сводка происшествий ОМВД, утро 23.05.2026.","content":"23.05.2026 в 06:15 у Старого пирса обнаружены мелкие личные вещи неизвестного владельца: связка ключей, пустой кожаный кошелёк, наручные часы и мокрая квитанция без читаемого текста. Личность владельца устанавливается. Материалы переданы сотрудникам полиции для проверки.","imgsrc":"images/сводка.webp"},{"title":"Объяснение Марины Громовой","source":"Протокол опроса Громовой М.С., архивиста музея, 23.05.2026.","content":"Громова М.С. подтверждает рабочий звонок Артёма вечером 22.05.2026 и говорит, что обсуждала с ним архивные материалы. Личность фигуры в красном шарфе она не указывает.","imgsrc":"images/опрос Громова.webp"},{"title":"Камера банкомата","source":"Камера банка на пр. Победы, 18. Фрагмент 22.05.2026.","content":"20:34:48. Светлана Лисицына стоит у банкомата на пр. Победы, 18. В руках светлая сумка. Запись получена по запросу полиции.","imgsrc":"images/камера банкомат.webp"},{"title":"Техническое заключение","source":"Техническое заключение по зданию гостиницы «Северная», 2026 год.","content":"В заключении указаны признаки аварийности отдельных конструкций и риск локального обрушения при работах без дополнительного обследования.","imgsrc":"images/заключение об аварийности.webp"},{"title":"CCTV автостанции","source":"Камера хранения автостанции. Фрагмент 22.05.2026.","content":"20:26:09. Человек в тёмном пальто и красном шарфе находится у ячейки №37. Лицо закрыто капюшоном и углом камеры. Через 20 секунд человек уходит в сторону платформ. Содержимое ячейки на записи не просматривается.","imgsrc":"images/ячейки.webp"},{"title":"Объяснение Романа Кудрина","source":"Протокол опроса Кудрина Р.И., водителя такси, 23.05.2026.","content":"Кудрин Р.И. подтверждает, что вечером 22.05.2026 находился на линии и был в районе автостанции. Поездку Артёма Лисицына через приложение он не подтверждает.","imgsrc":"images/опрос Кудрин.webp"},{"title":"Переписка Светланы и Артёма","source":"Фрагмент переписки Светланы и Артёма от 18.05.2026.","content":"Фрагмент переписки от 18.05.2026: Светлана просит Артёма не вмешиваться в вопрос продажи дачи и вернуть документы, которые он забрал из семейных вещей.","imgsrc":"images/переписка с сестрой.webp"},{"title":"Газетная вырезка","source":"Семейная папка Лисицыных.","content":"Вырезка из городской газеты от 17.08.1998. Сообщается, что при обрушении в технических помещениях гостиницы «Северная» погиб электромонтёр Виктор Павлович Лисицын, 42 года. Причиной происшествия предварительно названа «ошибка при проведении аварийных работ».","imgsrc":"images/газета.webp"},{"title":"Объяснение жительницы старого квартала","source":"Протокол опроса Сомовой А.Н., жительницы дома напротив гостиницы, 23.05.2026.","content":"Сомова А.Н. сообщает, что около 23:20 слышала возле гостиницы спор двух мужчин, а примерно в 23:40 — металлический скрежет во дворе гостиницы. Людей она не видела.","imgsrc":"images/опрос Сомова.webp"},{"title":"Журнал выдачи архивных материалов","source":"Внутренний журнал музея за 20–22.05.2026.","content":"В журнале выдачи архивных материалов за 20–22.05.2026 указаны обращения по фонду гостиницы «Северная». В записи от 22.05.2026 получателем значится Лисицын А.А.; в графе выдачи — архивист.","imgsrc":"images/журнал выдачи архива.webp"},{"title":"Рукописная записка","source":"Семейная папка, найденная среди материалов с дачи родителей.","content":"Подписи нет. Почерк, по словам Светланы, похож на почерк их отца.","imgsrc":"images/записка отца.webp"},{"title":"Фото с дачи","source":"Фотография из семейной папки Лисицыных.","content":"На снимке старая коробка с папками на деревянном столе. Подпись на фото: «Дача. Август 2008».","imgsrc":"images/файлы отца.webp"},{"title":"Письмо Миронова 17:16","source":"Почтовый ящик Артёма. 22.05.2026, 17:16.","content":"В письме от 22.05.2026, 17:16, Миронов О.В. настаивает, чтобы Артём не поднимал старые материалы и не передавал их дальше до внутренней проверки.","imgsrc":"images/письмо Миронова 2.webp"},{"title":"Карта города","source":"Схема мест, упомянутых в материалах дела.","content":"На карте отмечены ключевые точки: музей, кафе «Сова», автостанция, банкомат, гостиница «Северная», дом Павла, дача Лисицыных, Старый пирс, Старый квартал и Морская улица.","imgsrc":"images/карта.webp"},{"title":"Справка о гостинице","source":"Администрация г. Тихая Пристань. Справка №18-04/117 от 14.09.2018.","content":"Справка администрации от 14.09.2018 фиксирует прекращение эксплуатации гостиницы «Северная» и ограничение доступа в здание. В документе упомянуты служебные помещения и бывшая прачечная.","imgsrc":"images/справка о закрытии.webp"},{"title":"Черновик сообщения","source":"Черновик SMS на телефоне Артёма, сохранён до потери связи.","content":"В черновике Артём просит не отдавать материалы. Сообщение не было отправлено.","imgsrc":"images/черновик смс.webp"}];
+    const suspectsData = [
+      { title: 'Артём Лисицын', meta: '36 лет · реставратор городского музея', text: 'Работал с материалами по гостинице «Северная». Пропал вечером 22 мая.', img: 'images/Артем Лисицын.webp' },
+      { title: 'Марина Громова', meta: '33 года · архивист музея', text: 'Коллега Артёма. Отвечала за выдачу и учёт архивных материалов музея.', img: 'images/Марина Громова.webp' },
+      { title: 'Олег Миронов', meta: '45 лет · директор «Берег-Строй»', text: 'Руководит компанией, связанной с реконструкцией гостиницы.', img: 'images/Олег Миронов.webp' },
+      { title: 'Светлана Лисицына', meta: '39 лет · сестра Артёма', text: 'Подала заявление о пропаже утром 23 мая.', img: 'images/Светлана Лисицына.webp' },
+      { title: 'Роман Кудрин', meta: '39 лет · водитель такси', text: 'Знакомый семьи Лисицыных. Работал вечером 22 мая.', img: 'images/Роман Кудрин.webp' },
+      { title: 'Павел Сомов', meta: '58 лет · бывший смотритель гостиницы', text: 'Раньше работал в «Северной» и знает старое здание.', img: 'images/Павел Сомов.webp' }
+    ];
+    let currentEvidenceIndex = 0, dragIndex = null;
+    function getEvidenceOrder() { let saved = localStorage.getItem('severnaya_evidence_order'); let order = saved ? JSON.parse(saved) : evidence.map((_, i) => i); order = order.filter(i => evidence[i]); evidence.forEach((_, i) => { if (!order.includes(i)) order.push(i) }); return order; }
+    function setEvidenceOrder(order) { localStorage.setItem('severnaya_evidence_order', JSON.stringify(order)); }
+    function getMarks() { return JSON.parse(localStorage.getItem('severnaya_evidence_marks') || '{}'); }
+    function setMarks(marks) { localStorage.setItem('severnaya_evidence_marks', JSON.stringify(marks)); }
+    function buildNav() { const n = document.getElementById('nav'); sections.forEach((s, i) => { const b = document.createElement('button'); b.textContent = s[1]; b.className = i === 0 ? 'active' : ''; b.onclick = () => show(s[0], b); n.appendChild(b); }); renderSuspects(); renderEvidence(); }
+    function show(id, b) { document.querySelectorAll('.section').forEach(x => x.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('nav button').forEach(x => x.classList.remove('active')); b.classList.add('active'); }
+    function renderSuspects() { const grid = document.getElementById('suspectGrid'); if (!grid) return; grid.innerHTML = suspectsData.map(x => `<article class="card"><img class="portrait" src="${x.img}" alt="${x.title}"><h3>${x.title}</h3><p class="muted">${x.meta}</p><p>${x.text}</p></article>`).join(''); const c = document.getElementById('suspectCounter'); if (c) c.textContent = `${suspectsData.length} фигурантов`; }
+    function prevSuspectPage() { renderSuspects(); }
+    function nextSuspectPage() { renderSuspects(); }
+    function renderEvidence() { const grid = document.getElementById('evidenceGrid'); if (!grid) return; const order = getEvidenceOrder(); const marks = getMarks(); grid.innerHTML = order.map((idx, pos) => { const e = evidence[idx]; const mark = marks[idx] || ''; const img = e.imgsrc ? `<img class="thumb" src="${e.imgsrc}" alt="${e.title}">` : `<div class="thumb noimg">текстовый материал</div>`; return `<article class="card evidence" draggable="true" data-index="${idx}" onclick="openEvidence(${idx})" ondragstart="dragStart(event,${idx})" ondragover="dragOver(event)" ondrop="dropCard(event,${idx})" ondragend="dragEnd(event)">${img}<p class="badge">материал дела${mark === 'important' ? ' · важно' : mark === 'unimportant' ? ' · не важно' : ''}</p><h3>${e.title}</h3><div class="mark-row"><button class="mark-btn important ${mark === 'important' ? 'active' : ''}" onclick="markEvidence(event,${idx},'important')">важно</button><button class="mark-btn unimportant ${mark === 'unimportant' ? 'active' : ''}" onclick="markEvidence(event,${idx},'unimportant')">не важно</button></div><div class="grab-hint">перетащить карточку</div></article>` }).join(''); const c = document.getElementById('evidenceCounter'); if (c) c.textContent = `${order.length} материалов`; }
+    function prevEvidencePage() { renderEvidence(); }
+    function nextEvidencePage() { renderEvidence(); }
+    function resetEvidenceOrder() { localStorage.removeItem('severnaya_evidence_order'); renderEvidence(); }
+    function markEvidence(ev, idx, mark) { ev.stopPropagation(); const marks = getMarks(); marks[idx] = marks[idx] === mark ? '' : mark; if (!marks[idx]) delete marks[idx]; setMarks(marks); renderEvidence(); }
+    function dragStart(ev, idx) { dragIndex = idx; ev.currentTarget.classList.add('dragging'); ev.dataTransfer.effectAllowed = 'move'; }
+    function dragOver(ev) { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; }
+    function dropCard(ev, targetIndex) { ev.preventDefault(); ev.stopPropagation(); if (dragIndex === null || dragIndex === targetIndex) return; const order = getEvidenceOrder(); const from = order.indexOf(dragIndex), to = order.indexOf(targetIndex); if (from < 0 || to < 0) return; order.splice(from, 1); order.splice(to, 0, dragIndex); setEvidenceOrder(order); dragIndex = null; renderEvidence(); }
+    function dragEnd(ev) { ev.currentTarget.classList.remove('dragging'); dragIndex = null; }
+    function openEvidence(i) { currentEvidenceIndex = i; const e = evidence[i]; document.getElementById('mt').textContent = e.title; document.getElementById('mimg').innerHTML = e.imgsrc ? `<img class="case-img" src="${e.imgsrc}" alt="">` : ''; const src = e.source ? `<p><b>Источник:</b> ${e.source}</p>` : ''; const txt = e.content ? `<p>${e.content}</p>` : ''; document.getElementById('mbody').innerHTML = `${src}${txt}<div class="mark-row"><button class="mark-btn important" onclick="markEvidenceModal('important')">важно</button><button class="mark-btn unimportant" onclick="markEvidenceModal('unimportant')">не важно</button></div><div class="modal-nav"><button class="btn" onclick="prevEvidenceModal()">← Предыдущая</button><span class="counter">← / → на клавиатуре, Esc — закрыть</span><button class="btn" onclick="nextEvidenceModal()">Следующая →</button></div>`; document.getElementById('modal').style.display = 'flex'; }
+    function orderedNeighbor(delta) { const order = getEvidenceOrder(); let pos = order.indexOf(currentEvidenceIndex); if (pos < 0) pos = 0; pos = (pos + delta + order.length) % order.length; openEvidence(order[pos]); }
+    function prevEvidenceModal() { orderedNeighbor(-1) }
+    function nextEvidenceModal() { orderedNeighbor(1) }
+    function markEvidenceModal(mark) { const marks = getMarks(); marks[currentEvidenceIndex] = marks[currentEvidenceIndex] === mark ? '' : mark; if (!marks[currentEvidenceIndex]) delete marks[currentEvidenceIndex]; setMarks(marks); renderEvidence(); }
+    function closeModal() { document.getElementById('modal').style.display = 'none' }
+    function backdropClose(e) { if (e.target.id === 'modal') closeModal(); }
+
+    function isModalOpen() {
+      const modal = document.getElementById('modal');
+      return modal && modal.style.display === 'flex';
+    }
+    function handleKeyboardNavigation(ev) {
+      if (!isModalOpen()) return;
+      const tag = (ev.target && ev.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || ev.target?.isContentEditable) return;
+      if (ev.key === 'ArrowLeft') {
+        ev.preventDefault();
+        prevEvidenceModal();
+      } else if (ev.key === 'ArrowRight') {
+        ev.preventDefault();
+        nextEvidenceModal();
+      } else if (ev.key === 'Escape') {
+        ev.preventDefault();
+        closeModal();
+      }
+    }
+    document.addEventListener('keydown', handleKeyboardNavigation);
+
+    var quizData=[{q:'Что случилось с Артёмом?',opts:['Его похитили','Он погиб','Он уехал из города','Он инсценировал исчезновение'],a:3},{q:'Что планировал Артём?',opts:['Уехать из города','Скрыться от Миронова','Найти документы в подвале','Помириться с сестрой'],a:2},{q:'Кто фигура в тёмном пальто и красном шарфе?',opts:['Похититель Артёма','Случайный прохожий','Сам Артём в маскировке','Сообщник Артёма'],a:3},{q:'Как Артём добрался от автостанции к старому кварталу?',opts:['На автобусе','Пешком','На своей машине','Его подвёз Кудрин'],a:3},{q:'Как он попал в закрытое здание?',opts:['Взломал вход','Через окно','Дверь была открыта','Через служебный проход'],a:3},{q:'Какова роль Миронова?',opts:['Похитил Артёма','Помогал Артёму','Давил на него','Был ни при чём'],a:2},{q:'Что двигало Артёмом?',opts:['Конфликт из-за дачи','Долги и деньги','Давление Миронова','Гибель дяди в 1998-м'],a:3}];var trueStoryText='<p>В ночь на 23 мая Артём проник в подвал «Северной».</p><p>Там он обнаружил часть документов, которые искал: старые схемы, служебные записи, материалы обследований и документы, связанные с аварией 1998 года.</p><p>Но главным открытием оказались даже не обстоятельства гибели его дяди.</p><p>Сопоставив найденные материалы с современными документами реконструкции, Артём убедился, что часть подземных помещений и старых конструкций либо не была отражена в новых материалах, либо упоминалась лишь формально.</p><p>За несколько недель до исчезновения он всё чаще задавался вопросом: что произойдёт, если работы начнутся раньше, чем здание будет обследовано полностью?</p><p>Если его подозрения были верны, новая реконструкция могла затронуть конструкции, состояние которых никто достоверно не проверял много лет.</p><p>Именно поэтому Артём не стал обращаться в прессу сразу и не передал материалы журналистам.</p><p>Сначала он хотел убедиться, что документы существуют на самом деле и что его подозрения не основаны на слухах и семейных историях.</p><p>Олег Миронов действительно пытался убедить Артёма отказаться от поисков, опасаясь задержек реконструкции и новых проверок. Однако к исчезновению он отношения не имел.</p><p>Светлана Лисицына действительно скрывала долги и конфликт с братом из-за продажи семейной дачи. Но и она не была причастна к исчезновению.</p><p>Роман скрывал лишь неофициальную поездку.</p><p>Марина — своё участие в инсценировке.</p><p>Павел — помощь Артёму.</p><p>Каждый лгал. Но никто не совершал преступления.</p><p>В конце концов расследование привело к неожиданному выводу.</p><p>Главным вопросом было то, что именно он нашёл в старом подвале гостиницы «Северная» — и почему решил рискнуть всем ради одной ночи поисков.</p><p>Потому что иногда прошлое оказывается не похороненным под слоем пыли.</p><p>Иногда оно всё ещё способно повлиять на будущее.</p>';function renderQuiz(){var el=document.getElementById('quiz');if(!el)return;var h='';for(var qi=0;qi<quizData.length;qi++){var it=quizData[qi];h+='<div class="card"><h3>'+(qi+1)+'. '+it.q+'</h3><div class="answers">';for(var oi=0;oi<it.opts.length;oi++){h+='<label><input type="radio" name="q'+qi+'" value="'+oi+'">'+it.opts[oi]+'</label>';}h+='</div></div>';}el.innerHTML=h;}function checkVersion(){var correct=0;var cards=document.querySelectorAll('#quiz .card');for(var qi=0;qi<quizData.length;qi++){var it=quizData[qi];var sel=document.querySelector('input[name="q'+qi+'"]:checked');var card=cards[qi];if(card)card.style.borderColor='';if(sel&&parseInt(sel.value,10)===it.a){correct++;}else if(card){card.style.borderColor='var(--bad)';}}document.getElementById('quizScore').textContent='Правильных: '+correct+' из '+quizData.length;var res=document.getElementById('quizResult');var st=document.getElementById('trueStory');res.style.display='block';if(correct===quizData.length){res.className='result good';res.innerHTML='Ваша версия полностью сходится с материалами.';}else if(correct>=4){res.className='result mid';res.innerHTML='Близко: совпало '+correct+' из '+quizData.length+'. Неверные ответы отмечены.';}else{res.className='result bad';res.innerHTML='Версия ещё не сложилась: совпало '+correct+' из '+quizData.length+'. Неверные ответы отмечены.';}st.style.display='block';st.innerHTML='<h3>Что произошло на самом деле</h3>'+trueStoryText;st.scrollIntoView({behavior:'smooth'});}
+    function saveNotes() { localStorage.setItem('severnaya_v24_notes', document.getElementById('notesArea').value); document.getElementById('saved').textContent = ' сохранено'; }
+    buildNav();renderQuiz();
+    document.getElementById('notesArea').value = localStorage.getItem('severnaya_v24_notes') || '';
+  </script>
+</body>
+
+</html>
